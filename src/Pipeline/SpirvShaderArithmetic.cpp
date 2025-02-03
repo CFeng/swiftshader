@@ -323,6 +323,9 @@ void SpirvEmitter::EmitUnaryOp(Spirv::InsnIterator insn)
 				dst.move(i, Abs(dpdx) + Abs(dpdy));
 			}
 			break;
+		case spv::OpFConvert:
+			dst.move(i, src.Float(i));
+			break;
 		case spv::OpQuantizeToF16:
 			{
 				// Note: keep in sync with the specialization constant version in EvalSpecConstantUnaryOp

@@ -19,6 +19,7 @@
 
 #include "Device/Context.hpp"
 #include "System/Debug.hpp"
+#include "System/Half.hpp"
 #include "Vulkan/VkPipelineLayout.hpp"
 #include "Vulkan/VkRenderPass.hpp"
 
@@ -321,7 +322,18 @@ Spirv::Spirv(
 
 		case spv::OpConstant:
 		case spv::OpSpecConstant:
-			CreateConstant(insn).constantValue[0] = insn.word(3);
+			{
+				Type::ID typeId = insn.word(1);
+				auto def = getType(typeId).definition;
+				if(def.opcode() == spv::OpTypeFloat && def.word(2) == 16)  // Check if it's FP16. OpTypeFloat's word(2) is the width (32 or 16).
+				{
+					CreateConstant(insn).constantValue[0] = bit_cast<uint32_t>(float(shortAsHalf(insn.word(3))));
+				}
+				else
+				{
+					CreateConstant(insn).constantValue[0] = insn.word(3);
+				}
+			}
 			break;
 		case spv::OpConstantFalse:
 		case spv::OpSpecConstantFalse:
@@ -391,6 +403,7 @@ Spirv::Spirv(
 				{
 				case spv::CapabilityMatrix: capabilities.Matrix = true; break;
 				case spv::CapabilityShader: capabilities.Shader = true; break;
+				case spv::CapabilityFloat16: capabilities.Float16 = true; break;
 				case spv::CapabilityStorageImageMultisample: capabilities.StorageImageMultisample = true; break;
 				case spv::CapabilityClipDistance: capabilities.ClipDistance = true; break;
 				case spv::CapabilityCullDistance: capabilities.CullDistance = true; break;
@@ -531,7 +544,7 @@ Spirv::Spirv(
 			break;
 
 		case spv::OpFConvert:
-			UNSUPPORTED("SPIR-V Float16 or Float64 Capability (OpFConvert)");
+			DefineResult(insn);
 			break;
 
 		case spv::OpSConvert:
@@ -2167,6 +2180,7 @@ void SpirvEmitter::EmitInstruction(InsnIterator insn)
 		case spv::OpDPdxFine:
 		case spv::OpDPdyFine:
 		case spv::OpFwidthFine:
+		case spv::OpFConvert:
 		case spv::OpQuantizeToF16:
 			return EmitUnaryOp(insn);
 

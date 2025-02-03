@@ -580,6 +580,7 @@ public:
 	{
 		bool Matrix : 1;
 		bool Shader : 1;
+		bool Float16 : 1;
 		bool StorageImageMultisample : 1;
 		bool ClipDistance : 1;
 		bool CullDistance : 1;
