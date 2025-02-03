@@ -231,6 +231,7 @@ add_custom_command(
     # Copy to ${CMAKE_BINARY_DIR}/bin so the library sits next to the PVR samples.
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:vk_swiftshader> ${CMAKE_BINARY_DIR}/bin/${VULKAN_API_LIBRARY_NAME}
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:vk_swiftshader> C:/work/Vulkan/Vulkan-Samples/build/windows/app/bin/debug/AMD64/${VULKAN_API_LIBRARY_NAME}
 )
 
 # The SWIFTSHADER_VULKAN_API_LIBRARY_INSTALL_PATH environment variable can be set to a path
