@@ -323,6 +323,12 @@ void SpirvEmitter::EmitUnaryOp(Spirv::InsnIterator insn)
 				dst.move(i, Abs(dpdx) + Abs(dpdy));
 			}
 			break;
+		case spv::OpUConvert:
+			dst.move(i, src.UInt(i));
+			break;
+		case spv::OpSConvert:
+			dst.move(i, src.Int(i));
+			break;
 		case spv::OpFConvert:
 			dst.move(i, src.Float(i));
 			break;

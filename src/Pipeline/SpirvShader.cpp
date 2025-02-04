@@ -432,6 +432,8 @@ Spirv::Spirv(
 				case spv::CapabilityGroupNonUniformShuffle: capabilities.GroupNonUniformShuffle = true; break;
 				case spv::CapabilityGroupNonUniformShuffleRelative: capabilities.GroupNonUniformShuffleRelative = true; break;
 				case spv::CapabilityGroupNonUniformQuad: capabilities.GroupNonUniformQuad = true; break;
+				case spv::CapabilityStorageBuffer16BitAccess: capabilities.StorageBuffer16BitAccess = true; break;
+				case spv::CapabilityStoragePushConstant16: capabilities.StoragePushConstant16 = true; break;
 				case spv::CapabilityDeviceGroup: capabilities.DeviceGroup = true; break;
 				case spv::CapabilityMultiView: capabilities.MultiView = true; break;
 				case spv::CapabilitySignedZeroInfNanPreserve: capabilities.SignedZeroInfNanPreserve = true; break;
@@ -548,11 +550,11 @@ Spirv::Spirv(
 			break;
 
 		case spv::OpSConvert:
-			UNSUPPORTED("SPIR-V Int16 or Int64 Capability (OpSConvert)");
+			DefineResult(insn);
 			break;
 
 		case spv::OpUConvert:
-			UNSUPPORTED("SPIR-V Int16 or Int64 Capability (OpUConvert)");
+			DefineResult(insn);
 			break;
 
 		case spv::OpLoad:
@@ -2180,6 +2182,8 @@ void SpirvEmitter::EmitInstruction(InsnIterator insn)
 		case spv::OpDPdxFine:
 		case spv::OpDPdyFine:
 		case spv::OpFwidthFine:
+		case spv::OpUConvert:
+		case spv::OpSConvert:
 		case spv::OpFConvert:
 		case spv::OpQuantizeToF16:
 			return EmitUnaryOp(insn);

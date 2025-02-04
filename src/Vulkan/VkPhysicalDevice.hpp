@@ -43,6 +43,7 @@ public:
 	bool hasExtendedFeatures(const VkPhysicalDeviceVulkan11Features *features) const;
 	bool hasExtendedFeatures(const VkPhysicalDeviceVulkan12Features *features) const;
 	bool hasExtendedFeatures(const VkPhysicalDeviceVulkan13Features *features) const;
+	bool hasExtendedFeatures(const VkPhysicalDevice16BitStorageFeatures *requested) const;
 	bool hasExtendedFeatures(const VkPhysicalDeviceDepthClipEnableFeaturesEXT *features) const;
 	bool hasExtendedFeatures(const VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *features) const;
 	bool hasExtendedFeatures(const VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *features) const;

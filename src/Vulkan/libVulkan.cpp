@@ -356,6 +356,7 @@ static const ExtensionProperties instanceExtensionProperties[] = {
 static const ExtensionProperties deviceExtensionProperties[] = {
 	{ { VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, VK_KHR_DRIVER_PROPERTIES_SPEC_VERSION } },
 	// Vulkan 1.1 promoted extensions
+	{ { VK_KHR_16BIT_STORAGE_EXTENSION_NAME, VK_KHR_16BIT_STORAGE_SPEC_VERSION } },
 	{ { VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, VK_KHR_BIND_MEMORY_2_SPEC_VERSION } },
 	{ { VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_SPEC_VERSION } },
 	{ { VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, VK_KHR_DEDICATED_ALLOCATION_SPEC_VERSION } },
@@ -830,11 +831,8 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(VkPhysicalDevice physicalDevice, c
 		case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES:
 			{
 				const VkPhysicalDevice16BitStorageFeatures *storage16BitFeatures = reinterpret_cast<const VkPhysicalDevice16BitStorageFeatures *>(extensionCreateInfo);
-
-				if(storage16BitFeatures->storageBuffer16BitAccess != VK_FALSE ||
-				   storage16BitFeatures->uniformAndStorageBuffer16BitAccess != VK_FALSE ||
-				   storage16BitFeatures->storagePushConstant16 != VK_FALSE ||
-				   storage16BitFeatures->storageInputOutput16 != VK_FALSE)
+				bool hasFeatures = vk::Cast(physicalDevice)->hasExtendedFeatures(storage16BitFeatures);
+				if(!hasFeatures)
 				{
 					return VK_ERROR_FEATURE_NOT_PRESENT;
 				}

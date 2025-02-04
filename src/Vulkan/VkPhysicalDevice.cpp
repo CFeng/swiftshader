@@ -108,10 +108,10 @@ static void getPhysicalDeviceSamplerYcbcrConversionFeatures(T *features)
 template<typename T>
 static void getPhysicalDevice16BitStorageFeatures(T *features)
 {
-	features->storageBuffer16BitAccess = VK_FALSE;
-	features->storageInputOutput16 = VK_FALSE;
-	features->storagePushConstant16 = VK_FALSE;
-	features->uniformAndStorageBuffer16BitAccess = VK_FALSE;
+	features->storageBuffer16BitAccess = VK_TRUE;
+	features->storageInputOutput16 = VK_TRUE;
+	features->storagePushConstant16 = VK_TRUE;
+	features->uniformAndStorageBuffer16BitAccess = VK_TRUE;
 }
 
 template<typename T>
@@ -289,8 +289,8 @@ static void getPhysicalDeviceShaderAtomicInt64Features(T *features)
 template<typename T>
 static void getPhysicalDeviceShaderFloat16Int8Features(T *features)
 {
-	features->shaderFloat16 = VK_FALSE;
-	features->shaderInt8 = VK_FALSE;
+	features->shaderFloat16 = VK_TRUE;
+	features->shaderInt8 = VK_TRUE;
 }
 
 template<typename T>
@@ -1658,6 +1658,16 @@ bool PhysicalDevice::hasExtendedFeatures(const VkPhysicalDeviceVulkan13Features 
 	       CheckFeature(requested, supported, dynamicRendering) &&
 	       CheckFeature(requested, supported, shaderIntegerDotProduct) &&
 	       CheckFeature(requested, supported, maintenance4);
+}
+
+bool PhysicalDevice::hasExtendedFeatures(const VkPhysicalDevice16BitStorageFeatures *requested) const
+{
+	auto supported = getSupportedFeatures(requested);
+
+	return CheckFeature(requested, supported, storageBuffer16BitAccess) &&
+	       CheckFeature(requested, supported, uniformAndStorageBuffer16BitAccess) &&
+	       CheckFeature(requested, supported, storagePushConstant16) &&
+	       CheckFeature(requested, supported, storageInputOutput16);
 }
 
 bool PhysicalDevice::hasExtendedFeatures(const VkPhysicalDeviceDepthClipEnableFeaturesEXT *requested) const
