@@ -331,6 +331,7 @@ void SpirvEmitter::EmitUnaryOp(Spirv::InsnIterator insn)
 			break;
 		case spv::OpFConvert:
 			dst.move(i, src.Float(i));
+			// RR_WATCH(i, src.Float(i), dst.Float(i));
 			break;
 		case spv::OpQuantizeToF16:
 			{

@@ -69,11 +69,24 @@ void SpirvEmitter::EmitLoad(InsnIterator insn)
 	{
 		auto &dst = createIntermediate(resultId, resultTy.componentCount);
 		shader.VisitMemoryObject(pointerId, false, [&](const Spirv::MemoryElement &el) {
-			auto p = GetElementPointer(ptr, el.offset, pointerTy.storageClass);
-			dst.move(el.index, p.Load<SIMD::Float>(robustness, activeLaneMask(), atomic, memoryOrder));
+			const auto& def = el.type.definition;
+			if (def.opcode() == spv::OpTypeFloat && def.word(2) == 16)
+			{
+				auto p = GetElementPointer(ptr, el.offset, pointerTy.storageClass);
+				dst.move(el.index, p.Load<SIMD::Float>(robustness, activeLaneMask(), atomic, memoryOrder));
+			}
+			else
+			{
+				auto p = GetElementPointer(ptr, el.offset, pointerTy.storageClass);
+				dst.move(el.index, p.Load<SIMD::Float>(robustness, activeLaneMask(), atomic, memoryOrder));
+			}
 		});
 
 		SPIRV_SHADER_DBG("Load(atomic: {0}, order: {1}, ptr: {2}, val: {3}, mask: {4})", atomic, int(memoryOrder), ptr, dst, activeLaneMask());
+		if (dst.componentCount == 4)
+		{
+			RR_WATCH(dst);
+		}
 	}
 }
 
@@ -330,10 +343,13 @@ void Spirv::VisitMemoryObjectInner(Type::ID id, Decorations d, uint32_t &index, 
 		break;
 	case spv::OpTypeVector:
 		{
-			auto elemStride = (d.InsideMatrix && d.HasRowMajor && d.RowMajor) ? d.MatrixStride : static_cast<int32_t>(sizeof(float));
+			Type::ID compTypeId = type.definition.word(2);
+			const auto& compDef = getType(compTypeId).definition;
+			bool isFP16 = compDef.opcode() == spv::OpTypeFloat && compDef.word(2) == 16;
+			auto elemStride = (d.InsideMatrix && d.HasRowMajor && d.RowMajor) ? d.MatrixStride : static_cast<int32_t>(isFP16 ? 2 : sizeof(float));
 			for(auto i = 0u; i < type.definition.word(3); i++)
 			{
-				VisitMemoryObjectInner(type.definition.word(2), d, index, offset + elemStride * i, resultIsPointer, f);
+				VisitMemoryObjectInner(compTypeId, d, index, offset + elemStride * i, resultIsPointer, f);
 			}
 		}
 		break;
